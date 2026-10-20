@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Resultados</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container mt-4 mb-5">
+        <!-- Título -->
+        <h1 class="display-5 fw-bold text-primary text-center my-4">
+            SLLMix: Uma Ferramenta Interativa para Explorar o Trade-off entre SLMs e LLMs
+        </h1>
+        <!-- Resultado -->
+        <h2 class="mb-4">
+            Resultados
+        </h2>
+
+        <!-- Estatísticas por fold-->
+        <ul class="nav nav-pills" id="foldNav">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-fold="0">Fold 0</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-fold="1">Fold 1</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-fold="2">Fold 2</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-fold="3">Fold 3</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-fold="4">Fold 4</a>
+            </li>
+        </ul>
+
+
+        <div class="card mb-4">
+            <div class="card-header fw-bold d-flex justify-content-between align-items-center">
+                <span id="tituloFold">Estatísticas Gerais</span>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 id="totalDocs">1500</h3>
+                                <small>Total de documentos</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 id="hardInstances">135</h3>
+                                <small id="hardPercent">
+                                    Instâncias difíceis (9%)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 id="hardInstances_limiar">0.80</h3>
+                                <small id="hardPercent">
+                                    Limiar de confiança para instâncias difíceis
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 id="errosSLM">60</h3>
+                                <small>Erros da SLM</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h3 id="errosLLM">40</h3>
+                                <small>Erros da LLM</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card text-center border-success">
+                            <div class="card-body">
+                                <h3 id="reducao" class="text-success">
+                                    33%
+                                </h3>
+                                <small>Redução dos erros</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Resultados gráficos -->
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Resultados Gráficos
+            </div>
+            <div class="card-body text-center">
+                <p class="text-muted">
+                    Eficência em segundos para cada etapa do processo de classificação automática de textos.
+                </p>
+                <img src="grafico_barra_tempo.png" id="grafico_eficiencia" class="img-fluid rounded shadow"
+                    alt="Gráfico de eficiência">
+            </div>
+        </div>
+
+
+
+        <!-- Métricas -->
+        <h3 class="mb-4">
+            Métricas de avaliação da eficácia da proposta de combinação
+        </h3>
+
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Eficácia da proposta de combinação - Métricas para seleção
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input metric-checkbox" type="checkbox" value="accuracy" id="accuracy">
+                        <label class="form-check-label" for="accuracy">
+                            Accuracy
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input metric-checkbox" type="checkbox" value="precision"
+                            id="precision">
+                        <label class="form-check-label" for="precision">
+                            Precision
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input metric-checkbox" type="checkbox" value="recall" id="recall">
+                        <label class="form-check-label" for="recall">
+                            Recall
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input metric-checkbox" type="checkbox" value="macro-f1" id="f1">
+                        <label class="form-check-label" for="f1">
+                            Macro-F1
+                        </label>
+                    </div>
+                </div>
+                <div id="tabelaContainer"></div>
+            </div>
+        </div>
+
+        <!-- Resultados numéricos -->
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Eficácia da proposta de combinação - Média dos folds e intervalo de confiança (95%)
+            </div>
+            <div class="card-body">
+                <!-- Eficácia -->
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Acurácia</th>
+                            <th>Precision</th>
+                            <th>Recall</th>
+                            <th>Macro-F1</th>
+                        </tr>
+                        <tr>
+                            <td>0.85 (0.02)</td>
+                            <td>0.82 (0.03)</td>
+                            <td>0.83 (0.04)</td>
+                            <td>0.81 (0.01)</td>
+                        </tr>
+                    </thead>
+                    <tbody id="resultTable_eficacia">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- Métricas -->
+        <h3 class="mb-4">
+            Verificação da quantidade de instâncias difíceis a partir do limiar de confiança da SLM
+        </h3>
+        <!-- Instancias dificeis-->
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Limiar para determinar instâncias difíceis
+            </div>
+            <div class="card-body">
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Valor do limiar: <span id="valor" class="badge bg-primary fs-6">0</span>
+                    </label>
+
+                    <input type="range" class="form-range" id="customRange" min="0" max="1" step="0.05" value="0">
+                </div>
+                Tamanho do conjunto de instâncias difíceis:
+                <div class="progress mt-2" style="height: 25px;">
+                    <div id="barra" class="progress-bar" style="width: 0%;">
+                        0
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Análise qualitativa -->
+        <h3 class="mb-4">
+            Análise qualitativa
+        </h3>
+        <ul class="nav nav-pills" id="aba_qualitativa">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-aba="0">Acertos da LLM em relação a SLM</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-aba="2">Documentos que continua errando</a>
+            </li>
+        </ul>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID do documento</th>
+                                <th>Texto</th>
+                                <th>Rótulo</th>
+                                <th>Predição SLM</th>
+                                <th>Predição LLM</th>
+                                <th>Avaliação taxonômica do erro
+
+                                    <button id="resultFile" class="btn btn-primary">
+                                        Adcionar na lista
+                                    </button>
+
+                                </th>
+                                <th>Anotação livre</th>
+
+                            </tr>
+
+                        </thead>
+                        <tbody id="resultTable_exemplos">
+                            <tr>
+                                <td id="id_doc">12</td>
+                                <td id="texto_doc">Neste hotel a entrada de animais é permitida.</td>
+                                <td id="rotulo">Positivo</td>
+                                <td id="predicao_slm">Negativo</td>
+                                <td id="predicao_llm">Positivo</td>
+                                <td>
+                                    <div class="row row-cols-2 g-2">
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="ambivalente"
+                                                    value="ambivalente">
+                                                <label class="form-check-label" for="ambivalente">
+                                                    Ambivalente
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="conhecimentoMundo"
+                                                    value="conhecimento_mundo">
+                                                <label class="form-check-label" for="conhecimentoMundo">
+                                                    Conhecimento de mundo
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="expressaoIdiomática"
+                                                    value="expressao_idiomatica">
+                                                <label class="form-check-label" for="expressaoIdiomática">
+                                                    Expressão idiomática
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="ironia"
+                                                    value="ironia">
+                                                <label class="form-check-label" for="ironia">
+                                                    Ironia
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="negacao"
+                                                    value="negacao">
+                                                <label class="form-check-label" for="negacao">
+                                                    Negação
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="ortografiaNaoPadronizada" value="ortografia_nao_padronizada">
+                                                <label class="form-check-label" for="ortografiaNaoPadronizada">
+                                                    Ortografia não padronizada
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="sarcasmo"
+                                                    value="sarcasmo">
+                                                <label class="form-check-label" for="sarcasmo">
+                                                    Sarcasmo
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+                                <td style="min-width: 350px;">
+    <textarea
+        id="anotacao_12"
+        class="form-control"
+        rows="4"
+        style="width: 100%;"
+        placeholder="Digite sua análise..."></textarea>
+</td>
+                            </tr>
+                            <!-- <tr>
+                                <td id="id_doc2">27</td>
+                                <td id="texto_doc2">Não encontrada nada de errado neste produto.</td>
+                                <td id="rotulo2">Positivo</td>
+                                <td id="predicao_slm2">Negativo</td>
+                                <td id="predicao_llm2">Positivo</td>
+                                <td>
+                                    <div class="row row-cols-2 g-2">
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="ambivalente"
+                                                    value="ambivalente">
+                                                <label class="form-check-label" for="ambivalente">
+                                                    Ambivalente
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="conhecimentoMundo"
+                                                    value="conhecimento_mundo">
+                                                <label class="form-check-label" for="conhecimentoMundo">
+                                                    Conhecimento de mundo
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="expressaoIdiomática"
+                                                    value="expressao_idiomatica">
+                                                <label class="form-check-label" for="expressaoIdiomática">
+                                                    Expressão idiomática
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="ironia"
+                                                    value="ironia">
+                                                <label class="form-check-label" for="ironia">
+                                                    Ironia
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="negacao"
+                                                    value="negacao">
+                                                <label class="form-check-label" for="negacao">
+                                                    Negação
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox"
+                                                    id="ortografiaNaoPadronizada" value="ortografia_nao_padronizada">
+                                                <label class="form-check-label" for="ortografiaNaoPadronizada">
+                                                    Ortografia não padronizada
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="sarcasmo"
+                                                    value="sarcasmo">
+                                                <label class="form-check-label" for="sarcasmo">
+                                                    Sarcasmo
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+                            
+                                <td>
+                                    <textarea id="anotacao_12" class="form-control" rows="4"
+                                        placeholder="Digite sua análise..."></textarea>
+                                </td>
+                            </tr> -->
+                        </tbody>
+                    </table>
+
+                </div>
+                <button id="resultFile" class="btn btn-primary">
+                    Download arquivo dos exemplos qualitativos
+                </button>
+            </div>
+
+        </div>
+
+
+
+
+        <h3 class="mb-4">
+            Resultados completos em arquivo CSV para download
+        </h3>
+        <!-- Download -->
+        <div class="card mb-4">
+            <div class="card-header fw-bold">
+                Resultado completo por fold
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Index Fold</th>
+                                <th>Index Hard Instance</th>
+                                <th>Predição SLM</th>
+                                <th>Predição LLM</th>
+                                <th>Predição Combinação</th>
+                                <th>Limiar para determinar hard instance</th>
+                                <th>Tempo ajuste fino SLM</th>
+                                <th>Tempo predição SLM</th>
+                                <th>Tempo predição LLM</th>
+                                <th>Tempo determinação do limiar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0</td>
+                                <td>[12,34,57,...]</td>
+                                <td>[1,0,1,1,0,...]</td>
+                                <td>[1,0,0,1,0,...]</td>
+                                <td>[1,0,1,1,0,...]</td>
+                                <td>0.80</td>
+                                <td>560</td>
+                                <td>40</td>
+                                <td>80</td>
+                                <td>5</td>
+                            </tr>
+                            <tr>
+                                <td>1</td>
+                                <td>[11,18,46,...]</td>
+                                <td>[1,1,0,1,0,...]</td>
+                                <td>[0,0,0,1,0,...]</td>
+                                <td>[0,1,0,1,0,...]</td>
+                                <td>0.85</td>
+                                <td>520</td>
+                                <td>30</td>
+                                <td>90</td>
+                                <td>7</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button id="resultFile" class="btn btn-primary">
+                        Download de resultados de todos os folds
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const folds = {
+            0: {
+                docs: 1500,
+                hard: 135,
+                hardPercent: "Instâncias difíceis (9%)",
+                slm: 60,
+                llm: 40,
+                reducao: "33%",
+                grafico_eficiencia: "grafico_barra_tempo.png",
+                limiar: 0.80
+            },
+            1: {
+                docs: 1480,
+                hard: 110,
+                hardPercent: "Instâncias difíceis (7.4%)",
+                slm: 48,
+                llm: 29,
+                reducao: "39.6%",
+                grafico_eficiencia: "grafico_barra_tempo2.png",
+                limiar: 0.85
+            },
+            2: {
+                docs: 1520,
+                hard: 142,
+                hardPercent: "Instâncias difíceis (9.3%)",
+                slm: 70,
+                llm: 43,
+                reducao: "38.6%",
+                grafico_eficiencia: "grafico_barra_tempo3.png",
+                limiar: 0.90
+            },
+            3: {
+                docs: 1495,
+                hard: 128,
+                hardPercent: "Instâncias difíceis (8.6%)",
+                slm: 54,
+                llm: 35,
+                reducao: "35.2%",
+                grafico_eficiencia: "grafico_barra_tempo4.png",
+                limiar: 0.85
+            },
+            4: {
+                docs: 1505,
+                hard: 121,
+                hardPercent: "Instâncias difíceis (8.0%)",
+                slm: 51,
+                llm: 30,
+                reducao: "41.2%",
+                grafico_eficiencia: "grafico_barra_tempo5.png",
+                limiar: 0.95
+            }
+        };
+        document.querySelectorAll("#foldNav .nav-link").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                // Remove a seleção atual
+                document.querySelectorAll("#foldNav .nav-link")
+                    .forEach(l => l.classList.remove("active"));
+                // Ativa o item clicado
+                this.classList.add("active");
+                // Obtém o fold selecionado
+                const fold = this.dataset.fold;
+                const dados = folds[fold];
+                document.getElementById("totalDocs").textContent =
+                    dados.docs;
+                document.getElementById("hardInstances").textContent =
+                    dados.hard;
+                document.getElementById("hardPercent").textContent =
+                    dados.hardPercent;
+                document.getElementById("hardInstances_limiar").textContent =
+                    dados.limiar;
+                document.getElementById("errosSLM").textContent =
+                    dados.slm;
+                document.getElementById("errosLLM").textContent =
+                    dados.llm;
+                document.getElementById("reducao").textContent =
+                    dados.reducao;
+                document.getElementById("grafico_eficiencia").src =
+                    dados.grafico_eficiencia;
+            });
+        });
+
+        const qualitativa = {
+            0: {
+                id_doc: 12,
+                texto_doc: "Neste hotel a entrada de animais é permitida.",
+                rotulo: "Positivo",
+                predicao_slm: "Negativo",
+                predicao_llm: "Positivo"
+            },
+            1: {
+                id_doc: 27,
+                texto_doc: "Não encontrada nada de errado neste produto.",
+                rotulo: "Positivo",
+                predicao_slm: "Negativo",
+                predicao_llm: "Positivo"
+            },
+            2: {
+                id_doc: 32,
+                texto_doc: "Este produto é excelente.",
+                rotulo: "Negativo",
+                predicao_slm: "Positivo",
+                predicao_llm: "Positivo"
+            },
+            3: {
+                id_doc: 37,
+                texto_doc: "Não gostei do atendimento.",
+                rotulo: "Positivo",
+                predicao_slm: "Negativo",
+                predicao_llm: "Negativo"
+            }
+        }
+        document.querySelectorAll("#aba_qualitativa .nav-link").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                // Remove a seleção atual
+                document.querySelectorAll("#aba_qualitativa .nav-link")
+                    .forEach(l => l.classList.remove("active"));
+                // Ativa o item clicado
+                this.classList.add("active");
+                // Obtém o fold selecionado
+                const aba = this.dataset.aba;
+                dados = qualitativa[aba];
+
+
+                document.getElementById("id_doc").textContent =
+                    dados.id_doc;
+                document.getElementById("texto_doc").textContent =
+                    dados.texto_doc;
+                document.getElementById("rotulo").textContent =
+                    dados.rotulo;
+                document.getElementById("predicao_slm").textContent =
+                    dados.predicao_slm;
+                document.getElementById("predicao_llm").textContent =
+                    dados.predicao_llm;
+
+                dados = qualitativa[parseInt(aba) + 1];
+
+                document.getElementById("id_doc2").textContent =
+                    dados.id_doc;
+                document.getElementById("texto_doc2").textContent =
+                    dados.texto_doc;
+                document.getElementById("rotulo2").textContent =
+                    dados.rotulo;
+                document.getElementById("predicao_slm2").textContent =
+                    dados.predicao_slm;
+                document.getElementById("predicao_llm").textContent =
+                    dados.predicao_llm;
+
+            });
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.metric-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', gerarTabela);
+        });
+        function gerarTabela() {
+            const selecionados = [...document.querySelectorAll('.metric-checkbox:checked')]
+                .map(checkbox => checkbox.value);
+            const container = document.getElementById('tabelaContainer');
+            if (selecionados.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = `
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Fold</th>
+    `;
+            selecionados.forEach(metrica => {
+                html += `<th>${metrica}</th>`;
+            });
+            html += `
+                </tr>
+            </thead>
+            <tbody>
+    `;
+            const dados = {
+                accuracy: [0.85, 0.82, 0.88, 0.81, 0.90],
+                precision: [0.84, 0.80, 0.87, 0.79, 0.89],
+                recall: [0.86, 0.83, 0.89, 0.82, 0.91],
+                "macro-f1": [0.85, 0.81, 0.88, 0.80, 0.90]
+            };
+            for (let fold = 0; fold < 5; fold++) {
+                html += `<tr>`;
+                html += `<td>Fold ${fold}</td>`;
+                selecionados.forEach(metrica => {
+                    html += `<td>${dados[metrica][fold].toFixed(3)}</td>`;
+                });
+                html += `</tr>`;
+            }
+            html += `
+            </tbody>
+        </table>
+    `;
+            container.innerHTML = html;
+        }        
+    </script>
+    <script>
+        const range = document.getElementById('customRange');
+        const barra = document.getElementById('barra');
+        const valor = document.getElementById('valor');
+
+        range.addEventListener('input', function () {
+            const v = this.value;
+
+            if (v == 0.8) {
+                barra.style.width = 9 + '%';
+                barra.textContent = 9 + '%';
+            }
+            else if (v == 0.85) {
+                barra.style.width = (v * 10) * 2 + '%';
+                barra.textContent = (v * 10) * 2 + '%';
+            }
+            else if (v == 0.9) {
+                barra.style.width = (v * 10) * 2 + '%';
+                barra.textContent = (v * 10) * 2 + '%';
+            }
+            else if (v == 0.95) {
+                barra.style.width = (v * 10) * 2 + '%';
+                barra.textContent = (v * 10) * 2 + '%';
+            }
+            else if (v == 1) {
+                barra.style.width = (v * 100) + '%';
+                barra.textContent = (v * 100) + '%';
+            }
+            else {
+                barra.style.width = (v * 1) + '%';
+                barra.textContent = (v * 1) + '%';
+            }
+
+            valor.textContent = v;
+        });
+    </script>
+
+
+</body>
+
+</html>

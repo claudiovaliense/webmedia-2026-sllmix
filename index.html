@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ferramenta para Combinação de SLMs e LLMs</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="display-5 fw-bold text-primary text-center my-4">
+            SLLMix: Uma Ferramenta Interativa para Explorar o Trade-off entre SLMs e LLMs
+        </h1>
+        <form id="cmbsForm" action="resultado.html">
+            <!--  -->
+            <div class="mb-4">
+                <label for="" class="form-label">
+                    Dataset de treinamento e teste
+                    <img id="help1" src="duvida.png" width="18" style="cursor:pointer">
+                </label>
+                <input id="" class="form-control" type="file" accept=".csv">
+            </div>
+            <!-- Folds -->
+            <div class="mb-4">
+                <label for="folds" class="form-label">
+                    Arquivo de folds (opcional)
+                    <img id="help2" src="duvida.png" width="18" style="cursor:pointer">
+                </label>
+                <input id="folds" class="form-control" type="file" accept=".csv">
+            </div>
+            <!-- SLM -->
+            <div class="mb-4">
+                <label for="slm" class="form-label">
+                    Modelo de linguagem menor (SLM)
+                </label>
+                <select id="slm" class="form-select">
+                    <option selected disabled>
+                        Selecione um modelo
+                    </option>
+                    <option>BERT</option>
+                    <option>RoBERTa</option>
+                    <option>DistilBERT</option>
+                </select>
+            </div>
+            <!-- LLM -->
+            <div class="mb-4">
+                <label for="llm" class="form-label">
+                    Modelo de linguagem maior (LLM)
+                </label>
+                <select id="llm" class="form-select">
+                    <option selected disabled>
+                        Selecione um modelo
+                    </option>
+                    <option>Llama 3.1 7B</option>
+                    <option>Qwen 3 4B</option>
+                </select>
+            </div>
+            <!-- Prompt -->
+            <div class="mb-4">
+                <label for="folds" class="form-label">
+                    Arquivo do prompt (opcional)
+                    <img id="help3" src="duvida.png" width="18" style="cursor:pointer">
+                </label>
+                <input id="prompt" class="form-control" type="file" accept=".txt">
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Começar
+            </button>
+        </form>
+        <br>
+        <hr>
+        <div id="executando" class="d-none">
+            <!-- Etapa 1 -->
+            <div id="etapa1" class="mb-2">
+                <button class="btn btn-primary" disabled>
+                    <span class="spinner-border spinner-border-sm"></span>
+                    Executando ajuste fino SLM...
+                </button>
+            </div>
+            <!-- Etapa 2 -->
+            <div id="etapa2" class="mb-2 d-none">
+                <button class="btn btn-primary" disabled>
+                    <span class="spinner-border spinner-border-sm"></span>
+                    Executando predição SLM...
+                </button>
+            </div>
+            <!-- Etapa 3 -->
+            <div id="etapa3" class="mb-2 d-none">
+                <button class="btn btn-primary" disabled>
+                    <span class="spinner-border spinner-border-sm"></span>
+                    Determinando instâncias difíceis...
+                </button>
+            </div>
+            <!-- Etapa 4 -->
+            <div id="etapa4" class="mb-2 d-none">
+                <button class="btn btn-primary" disabled>
+                    <span class="spinner-border spinner-border-sm"></span>
+                    Executando predição LLM...
+                </button>
+            </div>
+        </div>
+        <!-- Resultado -->
+        <div id="resultado" class="d-none mt-3">
+            Link com os resultados: <a href="resultado.html">resultado_id_12.html</a>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function criarPopover(id, titulo, conteudo) {
+            new bootstrap.Popover(
+                document.getElementById(id),
+                {
+                    trigger: "hover focus",
+                    placement: "right",
+                    html: true,
+                    title: titulo,
+                    content: conteudo
+                }
+            );
+        }
+        criarPopover(
+            "help1",
+            "Formato do ",
+            `
+    Formato CSV, um documento por linha.<br><br>
+    <b>Exemplo:</b><br>
+    <code>
+    id,text,label<br>
+    0,"Este filme é legal",1<br>
+    1,"Não gostei deste filme por causa dos efeitos visuais",0<br>
+    ...
+    </code>
+    `
+        );
+        criarPopover(
+            "help2",
+            "Formato do arquivo de folds",
+            `
+    Formato CSV, uma divisão por linha.<br><br>
+    <b>Exemplo:</b><br>
+    <code>
+    index_fold,train,val,test<br>
+    0,"0,1,3,6...","2,4...","5,8..."<br>
+    1,"0,1,2,6...","3,4...","7,9..."<br>
+    ...
+    </code>
+    `
+        );
+        criarPopover(
+            "help3",
+            "Formato do arquivo de prompt",
+            `
+    Formato TXT, um prompt.<br><br>
+    <b>Exemplo:</b><br>
+    <code>
+    Classify the text exclusively as positive (class 1) or negative (class 2):<br>
+Input: I love you.<br>
+Reference:<br>
+A. Positive<br>
+B. Negative<br>
+Answer: A<br>
+Input:  {Evaluate Text}<br>
+Reference:<br>
+A. Positive<br>
+B. Negative<br>
+Answer:  {Response from LLM}<br>
+    </code>
+    `
+        );
+    </script>
+    <script>
+        document.getElementById("cmbsForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            // Esconde o botão Começar
+            this.querySelector('button[type="submit"]').classList.add("d-none");
+            executarEtapas();
+            // Mostra Executando
+            //document.getElementById("executando").classList.remove("d-none");
+        });
+        function executarEtapas() {
+            // Mostra o container
+            document.getElementById("executando").classList.remove("d-none");
+            // Etapa 1
+            document.getElementById("etapa1").classList.remove("d-none");
+            setTimeout(function () {
+                // Esconde etapa 1
+                document.getElementById("etapa1").classList.add("d-none");
+                // Mostra etapa 2
+                document.getElementById("etapa2").classList.remove("d-none");
+                setTimeout(function () {
+                    // Esconde etapa 2
+                    document.getElementById("etapa2").classList.add("d-none");
+                    // Mostra etapa 3
+                    document.getElementById("etapa3").classList.remove("d-none");
+                    setTimeout(function () {
+                        // Esconde etapa 3
+                        document.getElementById("etapa3").classList.add("d-none");
+                        // Mostra etapa 4
+                        document.getElementById("etapa4").classList.remove("d-none");
+                        setTimeout(function () {
+                            // Esconde etapa 4
+                            document.getElementById("etapa4").classList.add("d-none");
+                            // Finalizou
+                            document.getElementById("executando").classList.add("d-none");
+                            // Mostra resultados
+                            document.getElementById("resultado").classList.remove("d-none");
+                        }, 2000);
+                    }, 2000);
+                }, 2000);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
